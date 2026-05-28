@@ -1,0 +1,34 @@
+<nav class="navbar">
+  <div class="navbar-brand">
+    <i class="fas fa-tasks"></i>
+    <span>TaskFlow</span>
+  </div>
+
+  <div class="navbar-links" [class.open]="menuOpen">
+    <a routerLink="/dashboard" routerLinkActive="active" (click)="menuOpen = false">
+      <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+    <a routerLink="/tasks" routerLinkActive="active" (click)="menuOpen = false">
+      <i class="fas fa-tasks"></i> Tasks
+    </a>
+    <a routerLink="/users" routerLinkActive="active" *ngIf="authService.isManager()" (click)="menuOpen = false">
+      <i class="fas fa-users"></i> Users
+    </a>
+  </div>
+
+  <div class="navbar-user">
+    <div class="user-info">
+      <div class="user-avatar-sm">{{ authService.currentUser?.username?.charAt(0)?.toUpperCase() }}</div>
+      <div class="user-details-sm">
+        <span class="user-name">{{ authService.currentUser?.username }}</span>
+        <span class="user-role role-{{ authService.userRole.toLowerCase() }}">{{ authService.userRole }}</span>
+      </div>
+    </div>
+    <button class="btn-logout" (click)="logout()" title="Logout">
+      <i class="fas fa-sign-out-alt"></i>
+    </button>
+    <button class="btn-hamburger" (click)="toggleMenu()">
+      <i [class]="menuOpen ? 'fas fa-times' : 'fas fa-bars'"></i>
+    </button>
+  </div>
+</nav>

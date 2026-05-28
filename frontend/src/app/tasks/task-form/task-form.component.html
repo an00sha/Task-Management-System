@@ -1,0 +1,92 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <i class="fas fa-tasks"></i>
+        {{ isEdit ? 'Edit Task' : 'Create New Task' }}
+      </h3>
+      <button class="modal-close" (click)="close()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form-group">
+          <label for="title">Title <span class="required">*</span></label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            placeholder="Enter task title"
+            [class.is-invalid]="title?.invalid && title?.touched"
+          />
+          <div class="error-msg" *ngIf="title?.invalid && title?.touched">
+            <span *ngIf="title?.errors?.['required']">Title is required.</span>
+            <span *ngIf="title?.errors?.['minlength']">Title must be at least 3 characters.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Enter task description (optional)"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" formControlName="status">
+              <option value="pending">Pending</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="priority">Priority</label>
+            <select id="priority" formControlName="priority">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="showAssignee">
+          <label for="assignedTo">Assign To</label>
+          <select id="assignedTo" formControlName="assignedTo">
+            <option value="">-- Select User --</option>
+            <option *ngFor="let user of assignableUsers" [value]="getUserId(user)">
+              {{ user.username }} ({{ user.role }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="dueDate">Due Date</label>
+          <input id="dueDate" type="date" formControlName="dueDate" />
+        </div>
+
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading" class="spinner"></span>
+            <span *ngIf="!loading">
+              <i class="fas fa-save"></i> {{ isEdit ? 'Update Task' : 'Create Task' }}
+            </span>
+            <span *ngIf="loading">{{ isEdit ? 'Updating...' : 'Creating...' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

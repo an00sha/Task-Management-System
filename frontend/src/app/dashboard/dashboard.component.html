@@ -1,0 +1,116 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-title">
+      <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+      <p>Welcome back, <strong>{{ authService.currentUser?.username }}</strong>
+        <span class="role-badge role-{{ authService.userRole.toLowerCase() }}">{{ authService.userRole }}</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card stat-total">
+      <div class="stat-icon"><i class="fas fa-list"></i></div>
+      <div class="stat-info">
+        <h3>{{ stats.total }}</h3>
+        <p>Total Tasks</p>
+      </div>
+    </div>
+    <div class="stat-card stat-pending">
+      <div class="stat-icon"><i class="fas fa-clock"></i></div>
+      <div class="stat-info">
+        <h3>{{ stats.pending }}</h3>
+        <p>Pending</p>
+      </div>
+    </div>
+    <div class="stat-card stat-progress">
+      <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+      <div class="stat-info">
+        <h3>{{ stats.inProgress }}</h3>
+        <p>In Progress</p>
+      </div>
+    </div>
+    <div class="stat-card stat-completed">
+      <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-info">
+        <h3>{{ stats.completed }}</h3>
+        <p>Completed</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-body">
+    <!-- Recent Tasks -->
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h3><i class="fas fa-tasks"></i> Recent Tasks</h3>
+        <a routerLink="/tasks" class="btn btn-sm btn-outline">View All</a>
+      </div>
+
+      <div class="loading-state" *ngIf="loading">
+        <div class="spinner-large"></div>
+      </div>
+
+      <div class="empty-state-sm" *ngIf="!loading && tasks.length === 0">
+        <i class="fas fa-inbox"></i>
+        <p>No tasks yet. <a routerLink="/tasks">Create one now</a></p>
+      </div>
+
+      <div class="task-table" *ngIf="!loading && tasks.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Assigned To</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let task of tasks">
+              <td class="task-title-cell">{{ task.title }}</td>
+              <td><span class="badge" [class]="getStatusClass(task.status)">{{ task.status }}</span></td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-danger': task.priority === 'high',
+                  'badge-primary': task.priority === 'medium',
+                  'badge-secondary': task.priority === 'low'
+                }">{{ task.priority }}</span>
+              </td>
+              <td>{{ task.assignedTo.username || '—' }}</td>
+              <td>{{ task.createdAt | date:'MMM d, y' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Team Leads (Manager Only) -->
+    <div class="dashboard-section" *ngIf="authService.isManager()">
+      <div class="section-header">
+        <h3><i class="fas fa-users"></i> Team Leads</h3>
+        <a routerLink="/users" class="btn btn-sm btn-outline">Manage Users</a>
+      </div>
+
+      <div class="empty-state-sm" *ngIf="teamLeads.length === 0">
+        <i class="fas fa-user-slash"></i>
+        <p>No team leads found.</p>
+      </div>
+
+      <div class="user-cards" *ngIf="teamLeads.length > 0">
+        <div class="user-card" *ngFor="let lead of teamLeads">
+          <div class="user-avatar">
+            {{ lead.username ? lead.username.charAt(0).toUpperCase() : '?' }}
+          </div>
+          <div class="user-info">
+            <h4>{{ lead.username }}</h4>
+            <p>{{ lead.email }}</p>
+            <span class="role-badge role-teamlead">Team Lead</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

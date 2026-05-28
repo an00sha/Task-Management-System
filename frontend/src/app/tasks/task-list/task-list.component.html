@@ -1,0 +1,122 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-title">
+      <h2><i class="fas fa-tasks"></i> Tasks</h2>
+      <span class="task-count">{{ filteredTasks.length }} task(s)</span>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateForm()">
+      <i class="fas fa-plus"></i> New Task
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Search tasks..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchChange()"
+      />
+    </div>
+    <div class="filter-group">
+      <select [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+      <select [(ngModel)]="selectedPriority" (change)="onFilterChange()">
+        <option value="">All Priorities</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-large"></div>
+    <p>Loading tasks...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && filteredTasks.length === 0">
+    <i class="fas fa-clipboard-list"></i>
+    <h3>No tasks found</h3>
+    <p>{{ tasks.length === 0 ? 'Create your first task to get started.' : 'No tasks match the current filters.' }}</p>
+    <button class="btn btn-primary" (click)="openCreateForm()" *ngIf="tasks.length === 0">
+      <i class="fas fa-plus"></i> Create Task
+    </button>
+  </div>
+
+  <!-- Task Grid -->
+  <div class="task-grid" *ngIf="!loading && filteredTasks.length > 0">
+    <div class="task-card" *ngFor="let task of filteredTasks" [class.completed]="task.status === 'completed'">
+      <div class="task-card-header">
+        <div class="task-badges">
+          <span class="badge" [class]="getStatusClass(task.status)">{{ task.status }}</span>
+          <span class="badge" [class]="getPriorityClass(task.priority)">{{ task.priority }}</span>
+        </div>
+        <div class="task-actions" *ngIf="canEdit(task) || canDelete(task)">
+          <button class="btn-icon" title="Edit" (click)="openEditForm(task)" *ngIf="canEdit(task)">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button
+            class="btn-icon btn-success"
+            title="Mark Complete"
+            (click)="markComplete(task)"
+            *ngIf="task.status !== 'completed' && canEdit(task)"
+          >
+            <i class="fas fa-check"></i>
+          </button>
+          <button class="btn-icon btn-danger" title="Delete" (click)="deleteTask(task)" *ngIf="canDelete(task)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="task-card-body">
+        <h3 class="task-title">{{ task.title }}</h3>
+        <p class="task-description" *ngIf="task.description">{{ task.description }}</p>
+      </div>
+
+      <div class="task-card-footer">
+        <div class="task-meta">
+          <span class="meta-item" title="Assigned to">
+            <i class="fas fa-user"></i> {{ task.assignedTo.username || 'Unassigned' }}
+          </span>
+          <span class="meta-item" title="Created by">
+            <i class="fas fa-user-edit"></i> {{ task.createdBy.username }}
+          </span>
+        </div>
+        <div class="task-dates">
+          <span *ngIf="task.dueDate" class="due-date" [class.overdue]="task.status !== 'completed' && task.dueDate < today">
+            <i class="fas fa-calendar"></i> {{ task.dueDate | date:'MMM d, y' }}
+          </span>
+          <span class="created-date">
+            <i class="fas fa-clock"></i> {{ task.createdAt | date:'MMM d' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task Form Modal -->
+<app-task-form
+  *ngIf="showTaskForm"
+  [task]="editingTask"
+  (onClose)="onFormClose()"
+  (onSaved)="onTaskSaved($event)"
+></app-task-form>

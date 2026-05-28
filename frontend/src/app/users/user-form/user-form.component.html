@@ -1,0 +1,106 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        <i class="fas fa-user"></i>
+        {{ isEdit ? 'Edit User' : 'Create New User' }}
+      </h3>
+      <button class="modal-close" (click)="close()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form-group">
+          <label for="username">Username <span class="required">*</span></label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Enter username"
+            [class.is-invalid]="username?.invalid && username?.touched"
+          />
+          <div class="error-msg" *ngIf="username?.invalid && username?.touched">
+            <span *ngIf="username?.errors?.['required']">Username is required.</span>
+            <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email <span class="required">*</span></label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter email"
+            [class.is-invalid]="email?.invalid && email?.touched"
+          />
+          <div class="error-msg" *ngIf="email?.invalid && email?.touched">
+            <span *ngIf="email?.errors?.['required']">Email is required.</span>
+            <span *ngIf="email?.errors?.['email']">Please enter a valid email.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">
+            Password <span class="required" *ngIf="!isEdit">*</span>
+            <span class="optional" *ngIf="isEdit">(leave blank to keep current)</span>
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="{{ isEdit ? 'Leave blank to keep current' : 'Enter password' }}"
+              [class.is-invalid]="password?.invalid && password?.touched"
+            />
+            <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+              <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            </button>
+          </div>
+          <div class="error-msg" *ngIf="password?.invalid && password?.touched">
+            <span *ngIf="password?.errors?.['required']">Password is required.</span>
+            <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters.</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="role">Role <span class="required">*</span></label>
+            <select id="role" formControlName="role">
+              <option value="Employee">Employee</option>
+              <option value="TeamLead">Team Lead</option>
+              <option value="Manager">Manager</option>
+            </select>
+          </div>
+
+          <div class="form-group" *ngIf="userForm.get('role')?.value === 'Employee'">
+            <label for="teamLeadId">Team Lead</label>
+            <select id="teamLeadId" formControlName="teamLeadId">
+              <option value="">-- No Team Lead --</option>
+              <option *ngFor="let lead of teamLeads" [value]="getUserId(lead)">
+                {{ lead.username }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" (click)="close()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading">
+            <span *ngIf="loading" class="spinner"></span>
+            <span *ngIf="!loading">
+              <i class="fas fa-save"></i> {{ isEdit ? 'Update User' : 'Create User' }}
+            </span>
+            <span *ngIf="loading">{{ isEdit ? 'Updating...' : 'Creating...' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

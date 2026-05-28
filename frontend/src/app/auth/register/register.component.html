@@ -1,0 +1,100 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <h1>Task Management</h1>
+      <p>Create your account</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user input-icon"></i>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Choose a username"
+            [class.is-invalid]="username?.invalid && username?.touched"
+          />
+        </div>
+        <div class="error-msg" *ngIf="username?.invalid && username?.touched">
+          <span *ngIf="username?.errors?.['required']">Username is required.</span>
+          <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters.</span>
+          <span *ngIf="username?.errors?.['maxlength']">Username cannot exceed 30 characters.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            [class.is-invalid]="email?.invalid && email?.touched"
+          />
+        </div>
+        <div class="error-msg" *ngIf="email?.invalid && email?.touched">
+          <span *ngIf="email?.errors?.['required']">Email is required.</span>
+          <span *ngIf="email?.errors?.['email']">Please enter a valid email.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Create a password"
+            [class.is-invalid]="password?.invalid && password?.touched"
+          />
+          <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+            <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+          </button>
+        </div>
+        <div class="error-msg" *ngIf="password?.invalid && password?.touched">
+          <span *ngIf="password?.errors?.['required']">Password is required.</span>
+          <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user-tag input-icon"></i>
+          <select id="role" formControlName="role" [class.is-invalid]="role?.invalid && role?.touched">
+            <option value="Employee">Employee</option>
+            <option value="TeamLead">Team Lead</option>
+            <option value="Manager">Manager</option>
+          </select>
+        </div>
+        <div class="error-msg" *ngIf="role?.invalid && role?.touched">
+          <span *ngIf="role?.errors?.['required']">Role is required.</span>
+        </div>
+      </div>
+
+      <div class="alert alert-danger" *ngIf="errorMessage">
+        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full" [disabled]="loading">
+        <span *ngIf="loading" class="spinner"></span>
+        <span *ngIf="!loading"><i class="fas fa-user-plus"></i> Create Account</span>
+        <span *ngIf="loading">Creating account...</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Already have an account? <a routerLink="/auth/login">Sign in here</a></p>
+    </div>
+  </div>
+</div>

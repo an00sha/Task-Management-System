@@ -1,0 +1,81 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="page-title">
+      <h2><i class="fas fa-users"></i> User Management</h2>
+      <span class="task-count">{{ filteredUsers.length }} user(s)</span>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateForm()">
+      <i class="fas fa-user-plus"></i> Add User
+    </button>
+  </div>
+
+  <div class="alert alert-success" *ngIf="successMessage">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+  <div class="alert alert-danger" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Search users..."
+        [(ngModel)]="searchQuery"
+        (input)="applyFilters()"
+      />
+    </div>
+    <div class="filter-group">
+      <select [(ngModel)]="selectedRole" (change)="applyFilters()">
+        <option value="">All Roles</option>
+        <option value="Manager">Manager</option>
+        <option value="TeamLead">Team Lead</option>
+        <option value="Employee">Employee</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner-large"></div>
+    <p>Loading users...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filteredUsers.length === 0">
+    <i class="fas fa-users-slash"></i>
+    <h3>No users found</h3>
+    <p>{{ users.length === 0 ? 'Add users to get started.' : 'No users match the filters.' }}</p>
+  </div>
+
+  <div class="user-grid" *ngIf="!loading && filteredUsers.length > 0">
+    <div class="user-card-full" *ngFor="let user of filteredUsers">
+      <div class="user-avatar-lg">{{ getInitial(user.username) }}</div>
+      <div class="user-details">
+        <div class="user-name-row">
+          <h3>{{ user.username }}</h3>
+          <span class="badge" [class]="getRoleBadgeClass(user.role)">{{ user.role }}</span>
+        </div>
+        <p class="user-email"><i class="fas fa-envelope"></i> {{ user.email }}</p>
+        <p class="user-joined" *ngIf="user.createdAt">
+          <i class="fas fa-calendar-check"></i> Joined {{ user.createdAt | date:'MMM d, y' }}
+        </p>
+      </div>
+      <div class="user-card-actions">
+        <button class="btn-icon" title="Edit" (click)="openEditForm(user)">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-icon btn-danger" title="Delete" (click)="deleteUser(user)">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-user-form
+  *ngIf="showUserForm"
+  [user]="editingUser"
+  (onClose)="onFormClose()"
+  (onSaved)="onUserSaved($event)"
+></app-user-form>
