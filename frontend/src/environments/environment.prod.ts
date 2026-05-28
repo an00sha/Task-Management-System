@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:5000/api',
+  apiUrl: 'https://task-management-system-60852.web.app',
   socketUrl: 'http://localhost:5000',
 };
